@@ -41,6 +41,25 @@ Un libro puede tener **0 o muchas reseñas**.
 
 ---
 
+## 📋 Requerimientos Funcionales
+
+### Libros
+- Crear un nuevo libro.  
+- Visualizar todos los libros.  
+- Consultar un libro por `id`.  
+- Modificar los datos de un libro.  
+- Eliminar un libro.  
+  - **Nota:** al eliminar un libro, también deben eliminarse todas sus reseñas asociadas (**eliminación en cascada**).  
+
+### Reseñas
+- Crear una reseña para un libro.  
+- Visualizar todas las reseñas de un libro.  
+- Consultar una reseña por `id`.  
+- Modificar una reseña.  
+- Eliminar una reseña.  
+
+---
+
 ## ✅ Tareas Principales
 
 ### 1. Configuración del Proyecto
@@ -53,24 +72,21 @@ Un libro puede tener **0 o muchas reseñas**.
 - **Endpoints para `Book`**:  
   - Crear libro  
   - Listar libros  
-  - Obtener un libro por `id`  
+  - Consultar libro por `id`  
   - Actualizar libro  
-  - Eliminar libro  
+  - Eliminar libro (con eliminación en cascada de reseñas).  
 - **Endpoints para `Review`**:  
   - Crear reseña para un libro  
   - Listar reseñas de un libro  
+  - Consultar reseña por `id`  
   - Actualizar reseña  
   - Eliminar reseña  
 
 ### 3. Pruebas Unitarias y Documentación
 - Configurar **pytest** y base de datos de pruebas.
-- Escribir pruebas unitarias para:  
-  - Creación de libros y reseñas.  
-  - Validaciones de campos (`rating < 5`, obligatoriedad de ciertos campos).  
-  - Relaciones entre `Book` y `Review`.  
-  - Actualización y eliminación de registros.  
-- Incluir **fixtures** para inicializar datos de prueba.  
-- Crear documentación del proyecto con **MkDocs**:  
+- Escribir pruebas unitarias para validar todos los casos de uso del CRUD (libros y reseñas).  
+- Probar eliminación en cascada de reseñas al eliminar un libro.  
+- Crear documentación técnica con **MkDocs**:  
   - Instalar MkDocs:  
     ```bash
     pip install mkdocs mkdocs-material
