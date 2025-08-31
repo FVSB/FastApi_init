@@ -18,6 +18,18 @@ class BookNotFound(BookDemoException):
     pass
 
 
+class TagNotFound(BookDemoException):
+    """Tag Not found"""
+
+    pass
+
+
+class TagAlreadyExists(BookDemoException):
+    """Tag already exists"""
+
+    pass
+
+
 def create_exception_handler(
     status_code: int, initial_detail: Any
 ) -> Callable[[Request, Exception], JSONResponse]:
@@ -54,6 +66,24 @@ def register_all_errors(app: FastAPI):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
         
+    app.add_exception_handler(
+        TagNotFound,
+        create_exception_handler(
+            status_code=status.HTTP_404_NOT_FOUND,
+            initial_detail={"message": "Tag Not Found", "error_code": "tag_not_found"},
+        ),
+    )
+
+    app.add_exception_handler(
+        TagAlreadyExists,
+        create_exception_handler(
+            status_code=status.HTTP_403_FORBIDDEN,
+            initial_detail={
+                "message": "Tag Already exists",
+                "error_code": "tag_exists",
+            },
+        ),
+    )
     
     @app.exception_handler(SQLAlchemyError)
     async def database__error(request, exc):
