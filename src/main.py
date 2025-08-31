@@ -18,8 +18,8 @@ app = FastAPI(name="Book Demo",
     version=version,
               description=description)  
 
-import asyncio
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
+#import asyncio
+#asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+#
 # Routers
 app.include_router(book_router, prefix=f"{version_prefix}/books", tags=["books"])

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import date,datetime
 import uuid
-class Book(BaseModel):
+class BookModel(BaseModel):
     uid: uuid.UUID
     title: str
     author: str
@@ -11,7 +11,9 @@ class Book(BaseModel):
     language_code: str =Field(max_length=5)
     created_at: datetime
     update_at: datetime
-
+    
+    def __repr__(self):
+        return f"__Book {self.title}__"
 
 class BookCreateModel(BaseModel):
     title: str
