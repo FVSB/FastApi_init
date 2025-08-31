@@ -18,14 +18,13 @@ class BookService:
 
     async def get_book_or_404(self, book_uid: uuid.UUID , session: AsyncSession, with_tags:bool=True) -> Book | None:
         statement = select(Book).where(Book.uid == book_uid) if not with_tags else select(Book).options(selectinload(Book.tags)).where(Book.uid == book_uid)
-
+       
         result = await session.exec(statement)
-
-        book = result.first()
         
+        book = result.first()
         if  book is None:
             raise BookNotFound()
-    
+        
         return book
         
     

@@ -14,20 +14,26 @@ book_service = BookService()
 
 
 # Get all books
-@book_router.get("/", response_model=List[BookModel])
-async def get_all_books(with_tags:bool=True,
-    session: AsyncSession = Depends(get_session),
-):
-    books = await book_service.get_all_books(session)
-    return books
+@book_router.get("/")
+async def get_all_books(with_tags: bool = True, session: AsyncSession = Depends(get_session)):
+    books = await book_service.get_all_books(session, with_tags=with_tags)
+    
+    if with_tags:
+        return [BookTagModel.model_validate(book) for book in books]
+    else:
+        return [BookModel.model_validate(book) for book in books]
 
 
-# Get book by id
-@book_router.get("/books/{book_uid}", response_model=BookModel)
-async def get_book(book_uid: uuid.UUID, with_tags:bool=True, session: AsyncSession = Depends(get_session)):
-    book = await book_service.get_book_or_404(book_uid=book_uid,with_tags=with_tags,session= session)
-
-    return BookTagModel(**book.model_dump()) if with_tags else BookModel(**book.model_dump())
+# Get book by id  
+@book_router.get("/books/{book_uid}")
+async def get_book(book_uid: uuid.UUID, with_tags: bool = True, session: AsyncSession = Depends(get_session)):
+    book = await book_service.get_book_or_404(book_uid=book_uid, with_tags=with_tags, session=session)
+    
+    # Convertir SQLModel a diccionario y luego a schema Pydantic
+    if with_tags:
+        return BookTagModel.model_validate(book,from_attributes=True)
+    else:
+        return BookModel.model_validate(book)
 
 
 # Create a new book

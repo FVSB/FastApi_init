@@ -1,14 +1,14 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,ConfigDict
 from datetime import date,datetime
 from src.tags.schemas import TagModel
-from typing import List
+from typing import List, Union
 import uuid
 
 from abc import ABC
 
 class BookAbstract(ABC,BaseModel):
     title: str =Field(max_length=100)
-    author: str =Field(max_length=100,unique=True)
+    author: str =Field(max_length=100)
     publisher: str
     page_count: int
     language_code: str = Field(max_length=5)
@@ -16,16 +16,20 @@ class BookAbstract(ABC,BaseModel):
         return f"__Book_{self.title}__"
     
 class BookCreateModel(BookAbstract):
-    pass
+    published_date: str  # Se enviará como string y se convertirá en el servicio
     
 class BookUpdateModel(BookAbstract):
-    pass
+    published_date: str
+    
 class BookModel(BookAbstract):
     uid: uuid.UUID
-    
+    published_date: date
+    created_at: datetime
+    update_at: datetime
     
 class BookTagModel(BookModel):
-    tags:List[TagModel]
+    model_config = ConfigDict(from_attributes=True)
+    tags: List[TagModel]
     
     
     
