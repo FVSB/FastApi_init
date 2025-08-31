@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from src.books.schemas import BookModel, BookCreateModel, BookUpdateModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.books.service import BookService
-from utils.errors import BookDemoException,BookNotFound
+from src.utils.errors import BookDemoException,BookNotFound
 
 
 book_router = APIRouter()

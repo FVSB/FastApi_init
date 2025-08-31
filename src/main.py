@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from src.books.routes import book_router
-
+from src.tags.routes import tags_router
 version = "v1"
 
 description = """
@@ -18,8 +18,6 @@ app = FastAPI(name="Book Demo",
     version=version,
               description=description)  
 
-#import asyncio
-#asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-#
-# Routers
+
 app.include_router(book_router, prefix=f"{version_prefix}/books", tags=["books"])
+app.include_router(tags_router, prefix=f"{version_prefix}/tags", tags=["tags"])

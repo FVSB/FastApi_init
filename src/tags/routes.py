@@ -5,11 +5,11 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 
-from src.books.schemas import Book
+from src.books.schemas import BookModel
 from src.db.main import get_session
 
-from .schemas import TagAddModel, TagCreateModel, TagModel
-from .service import TagService
+from src.tags.schemas import TagAddModel, TagCreateModel, TagModel
+from src.tags.service import TagService
 
 tags_router = APIRouter()
 tag_service = TagService()
@@ -39,11 +39,11 @@ async def add_tag(
 
 
 @tags_router.post(
-    "/book/{book_uid}/tags", response_model=Book
+    "/book/{book_uid}/tags", response_model=BookModel
 )
 async def add_tags_to_book(
     book_uid: str, tag_data: TagAddModel, session: AsyncSession = Depends(get_session)
-) -> Book:
+) -> BookModel:
 
     book_with_tag = await tag_service.add_tags_to_book(
         book_uid=book_uid, tag_data=tag_data, session=session
