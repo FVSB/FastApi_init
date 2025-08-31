@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from src.books.schemas import BookModel, BookCreateModel, BookUpdateModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.books.service import BookService
-
+from utils.errors import BookDemoException,BookNotFound
 
 
 book_router = APIRouter()
@@ -23,11 +23,11 @@ async def get_all_books(
 
 
 # Get book by id
-@book_router.get("/books/{book_id}", response_model=BookModel)
-async def get_book(book_id: int,  session: AsyncSession = Depends(get_session)):
+@book_router.get("/books/{book_uid}", response_model=BookModel)
+async def get_book(book_uid: int,  session: AsyncSession = Depends(get_session)):
     book = await book_service.get_book(id,session)
     if not book:
-        return  HTTPException(status_code=404, detail="Book not found")
+        return  BookNotFound()
     raise book
 
 # Create a new book
@@ -37,11 +37,11 @@ async def create_book(book_data: BookCreateModel,  session: AsyncSession = Depen
     return new_book
 
 # Update a book
-@book_router.put("/books/{book_id}", response_model=BookModel)
-async def update_book(book_id: int, updated_book_data: BookUpdateModel, session: AsyncSession = Depends(get_session)):
-    updated_book = await book_service.update_book(book_id, updated_book_data, session)
+@book_router.put("/books/{book_uid}", response_model=BookModel)
+async def update_book(book_uid: int, updated_book_data: BookUpdateModel, session: AsyncSession = Depends(get_session)):
+    updated_book = await book_service.update_book(book_uid, updated_book_data, session)
     if  update_book is None:
-        raise HTTPException(status_code=404, detail="Book not found")
+        raise BookNotFound()
 
     return update_book
 
@@ -50,5 +50,5 @@ async def update_book(book_id: int, updated_book_data: BookUpdateModel, session:
 async def delete_book(book_id: int, session: AsyncSession = Depends(get_session)):
     book_to_delete = await book_service.delete_book(book_id, session)
     if book_to_delete is None:
-        raise HTTPException(status_code=404, detail="Book not found")
+        raise BookNotFound()
     return {}
