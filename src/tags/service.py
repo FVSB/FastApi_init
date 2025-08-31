@@ -33,7 +33,7 @@ class TagService:
     ):
         """Add tags to a book"""
 
-        book = await book_service.get_book(book_uid=book_uid, session=session)
+        book = await book_service.get_book_or_404(book_uid=book_uid, session=session)
 
         if not book:
             raise BookNotFound()
@@ -42,6 +42,7 @@ class TagService:
             result = await session.exec(select(Tag).where(Tag.name == tag_item.name))
 
             tag = result.one_or_none()
+            
             if not tag:
                 tag = Tag(name=tag_item.name)
 

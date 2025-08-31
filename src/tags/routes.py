@@ -11,6 +11,8 @@ from src.db.main import get_session
 from src.tags.schemas import TagAddModel, TagCreateModel, TagModel
 from src.tags.service import TagService
 
+from src.db.models import Book
+
 tags_router = APIRouter()
 tag_service = TagService()
 
@@ -39,11 +41,11 @@ async def add_tag(
 
 
 @tags_router.post(
-    "/book/{book_uid}/tags", response_model=BookModel
+    "/book/{book_uid}/tags", response_model=Book
 )
 async def add_tags_to_book(
     book_uid: str, tag_data: TagAddModel, session: AsyncSession = Depends(get_session)
-) -> BookModel:
+) -> Book:
 
     book_with_tag = await tag_service.add_tags_to_book(
         book_uid=book_uid, tag_data=tag_data, session=session

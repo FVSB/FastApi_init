@@ -1,27 +1,31 @@
 from datetime import datetime
 from sqlmodel import desc, select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import selectinload
 from typing import Sequence
 from src.db.models import Book
-from src.books.schemas import BookModel, BookCreateModel, BookUpdateModel
+from src.books.schemas import BookModel, BookCreateModel, BookUpdateModel, BookTagModel
+from src.utils.errors import BookNotFound
 import uuid
 
 class BookService:
-    async def get_all_books(self, session: AsyncSession) -> Sequence[Book]:
-        statement = select(Book).order_by(desc(Book.created_at))
+    async def get_all_books(self, session: AsyncSession, with_tags:bool=True) -> Sequence[Book]:
+        statement = select(Book).order_by(desc(Book.created_at)) if not with_tags else select(Book).options(selectinload(Book.tags)).order_by(desc(Book.created_at))
 
         result = await session.exec(statement)
         
         return result.all()
 
-    async def get_book(self, book_uid: uuid.UUID , session: AsyncSession) -> Book | None:
-        statement = select(Book).where(Book.uid == book_uid)
+    async def get_book_or_404(self, book_uid: uuid.UUID , session: AsyncSession, with_tags:bool=True) -> Book | None:
+        statement = select(Book).where(Book.uid == book_uid) if not with_tags else select(Book).options(selectinload(Book.tags)).where(Book.uid == book_uid)
 
         result = await session.exec(statement)
 
         book = result.first()
         
-        
+        if  book is None:
+            raise BookNotFound()
+    
         return book
         
     
@@ -44,7 +48,7 @@ class BookService:
     async def update_book(
         self, book_uid: uuid.UUID, update_data: BookUpdateModel, session: AsyncSession
     ):
-        book_to_update = await self.get_book(book_uid, session)
+        book_to_update = await self.get_book_or_404(book_uid=book_uid,with_tags=False,session= session)
 
         if book_to_update is None:
             return None
@@ -52,7 +56,7 @@ class BookService:
         update_data_dict = update_data.model_dump()
 
         for k, v in update_data_dict.items():
-            print(f"3355 {k}")
+
             setattr(book_to_update, k, v)
             
         await session.commit()
@@ -65,7 +69,7 @@ class BookService:
     
     
     async def delete_book(self, book_uid: uuid.UUID, session: AsyncSession):
-        book_to_delete = await self.get_book(book_uid, session)
+        book_to_delete = await self.get_book_or_404(book_uid=book_uid,with_tags=True, session=session)
 
         if book_to_delete is None:
             return None

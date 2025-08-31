@@ -15,7 +15,7 @@ class Tag(SQLModel, table=True):
     uid: uuid.UUID = Field(
         sa_column=Column(pg.UUID, nullable=False, primary_key=True, default=uuid.uuid4)
     )
-    name: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
+    name: str = Field(sa_column=Column(pg.VARCHAR(length=100), nullable=False, unique=True))
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
     books: List["Book"] = Relationship(
         link_model=BookTag,
@@ -24,7 +24,7 @@ class Tag(SQLModel, table=True):
     )
 
     def __repr__(self) -> str:
-        return f"<Tag {self.name}>"
+        return f"__Tag_{self.name}__"
     
 
 
@@ -33,12 +33,12 @@ class Book(SQLModel, table=True):
     uid: uuid.UUID = Field(
         sa_column=Column(pg.UUID, nullable=False, primary_key=True, default=uuid.uuid4)
     )
-    title: str
-    author: str
+    title: str = Field(sa_column=Column(pg.VARCHAR(100), nullable=False,  unique=True))
+    author: str =  Field(sa_column=Column(pg.VARCHAR(100), nullable=True))
     publisher: str 
     published_date: date
     page_count: int
-    language_code: str= Field(max_length=5)
+    language_code: str= Field(max_length=5, sa_column=Column(pg.VARCHAR, nullable=False))
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP(timezone=True), default=func.now() ))
     update_at: datetime = Field(sa_column=Column(pg.TIMESTAMP(timezone=True),  default= func.now() ))
     tags: List[Tag] = Relationship(

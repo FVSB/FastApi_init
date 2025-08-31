@@ -11,7 +11,6 @@ class BookDemoException(Exception):
     pass
 
 
-
 class BookNotFound(BookDemoException):
     """Book Not found"""
 
@@ -30,6 +29,10 @@ class TagAlreadyExists(BookDemoException):
     pass
 
 
+class TagDuplicatedName(BookDemoException):
+    """Exists more than 1 tag with the same name"""
+
+
 def create_exception_handler(
     status_code: int, initial_detail: Any
 ) -> Callable[[Request, Exception], JSONResponse]:
@@ -41,20 +44,19 @@ def create_exception_handler(
     return exception_handler
 
 
-
 def register_all_errors(app: FastAPI):
 
     app.add_exception_handler(
-            BookNotFound,
-            create_exception_handler(
-                status_code=status.HTTP_404_NOT_FOUND,
-                initial_detail={
-                    "message": "Book Not Found",
-                    "error_code": "book_not_found",
-                },
-            ),
-        )
-    
+        BookNotFound,
+        create_exception_handler(
+            status_code=status.HTTP_404_NOT_FOUND,
+            initial_detail={
+                "message": "Book Not Found",
+                "error_code": "book_not_found",
+            },
+        ),
+    )
+
     @app.exception_handler(500)
     async def internal_server_error(request, exc):
 
@@ -65,7 +67,7 @@ def register_all_errors(app: FastAPI):
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-        
+
     app.add_exception_handler(
         TagNotFound,
         create_exception_handler(
@@ -84,7 +86,18 @@ def register_all_errors(app: FastAPI):
             },
         ),
     )
-    
+
+    app.add_exception_handler(
+        TagDuplicatedName,
+        create_exception_handler(
+            status_code=status.HTTP_409_CONFLICT,
+            initial_detail={
+                "message": "Exists more than 1 tag with the same name",
+                "error_code": "tag_duplicated_name",
+            },
+        ),
+    )
+
     @app.exception_handler(SQLAlchemyError)
     async def database__error(request, exc):
         print(str(exc))
