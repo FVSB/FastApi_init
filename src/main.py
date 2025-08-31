@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from src.books.routes import router  
+from src.books.routes import book_router
 
-version = "v0"
+version = "v1"
 
 description = """
 A REST API for a book review web service.
@@ -18,4 +18,6 @@ app = FastAPI(name="Book Demo",
     version=version,
               description=description)  
 
-app.include_router(router)  
+
+# Routers
+app.include_router(book_router, prefix=f"{version_prefix}/books", tags=["books"])
