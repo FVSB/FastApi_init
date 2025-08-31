@@ -11,7 +11,7 @@ class BookService:
         statement = select(Book).order_by(desc(Book.created_at))
 
         result = await session.exec(statement)
-
+        
         return result.all()
 
     async def get_book(self, book_uid: str, session: AsyncSession) -> Book | None:
@@ -29,6 +29,9 @@ class BookService:
         book_data_dict = book_data.model_dump()
 
         new_book = Book(**book_data_dict)
+        
+        new_book.published_date = datetime.strptime(
+            book_data_dict["published_date"], "%Y-%m-%d")
 
         session.add(new_book)
 

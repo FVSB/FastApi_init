@@ -1,12 +1,14 @@
 from pydantic import BaseModel, Field
 from datetime import date,datetime
+import uuid
 class Book(BaseModel):
+    uid: uuid.UUID
     title: str
     author: str
     publisher: str
     published_date: date
     page_count: int
-    language_code: str = Field(max_length=5)
+    language_code: str =Field(max_length=5)
     created_at: datetime
     update_at: datetime
 
@@ -17,7 +19,7 @@ class BookCreateModel(BaseModel):
     publisher: str
     published_date: str
     page_count: int
-    language: str
+    language_code: str
     
     
 class BookUpdateModel(BaseModel):
@@ -25,4 +27,4 @@ class BookUpdateModel(BaseModel):
     author: str
     publisher: str
     page_count: int
-    language: str
+    language_code: str
