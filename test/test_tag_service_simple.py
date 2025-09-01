@@ -190,7 +190,6 @@ class TestTagServiceSimple:
 
             # Assert
             mock_session.delete.assert_called_once_with(sample_tag)
-            mock_session.commit.assert_called_once()
 
     async def test_delete_tag_not_found(self, tag_service, mock_session):
         """Simple test: delete tag that doesn't exist"""

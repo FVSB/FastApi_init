@@ -170,9 +170,9 @@ class TagService:
         for k, v in update_data_dict.items():
             setattr(tag, k, v)
 
-            await session.commit()
+        await session.commit()
 
-            await session.refresh(tag)
+        await session.refresh(tag)
 
         return tag
 
@@ -194,9 +194,7 @@ class TagService:
             Permanently removes the tag and commits the transaction.
             Consider cascade effects on book-tag relationships.
         """
-        
-
-        tag = self.get_tag_by_uid(tag_id,session)
+        tag = await self.get_tag_by_uid(tag_id, session)
 
         if not tag:
             raise TagNotFound()

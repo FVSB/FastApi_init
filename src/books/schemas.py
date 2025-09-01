@@ -12,7 +12,6 @@ class BookAbstract(ABC,BaseModel):
     published_date: str 
     page_count: int
     language_code: str = Field(max_length=5)
-    published_date: date
     created_at: datetime
     update_at: datetime
     def __repr__(self):
