@@ -9,7 +9,7 @@ class BookAbstract(ABC,BaseModel):
     title: str =Field(max_length=100)
     author: str =Field(max_length=100)
     publisher: str
-    published_date: str 
+    published_date: date 
     page_count: int
     language_code: str = Field(max_length=5)
     created_at: datetime

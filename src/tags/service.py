@@ -67,13 +67,13 @@ class TagService:
         if not book:
             raise BookNotFound()
 
-        for tag_item in tag_data.tags:
-            result = await session.exec(select(Tag).where(Tag.name == tag_item.name))
+        for tag_id in tag_data.tags:
+            result = await session.exec(select(Tag).where(Tag.id == tag_id))
 
             tag = result.one_or_none()
             
             if not tag:
-                tag = Tag(name=tag_item.name)
+                tag = Tag(id=tag_id)
 
             book.tags.append(tag)
         session.add(book)

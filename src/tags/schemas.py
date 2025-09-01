@@ -16,5 +16,6 @@ class TagCreateModel(BaseModel):
     name: str
 
 
+
 class TagAddModel(BaseModel):
-    tags: List[TagCreateModel]
+    tags: List[int]

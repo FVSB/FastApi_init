@@ -206,8 +206,7 @@ class TestTagServiceSimple:
         """Simple test: add tags to existing book"""
         # Arrange
         tag_data = TagAddModel(tags=[
-            TagCreateModel(name="Fiction"),
-            TagCreateModel(name="Adventure")
+            1,2
         ])
         
         # Mock for book_service.get_book_or_404
@@ -230,7 +229,7 @@ class TestTagServiceSimple:
     async def test_add_tags_to_book_not_found(self, tag_service, mock_session):
         """Simple test: add tags to book that doesn't exist"""
         # Arrange
-        tag_data = TagAddModel(tags=[TagCreateModel(name="Fiction")])
+        tag_data = TagAddModel(tags=[1])
         
         # Mock for book_service.get_book_or_404 to raise exception
         with patch('src.tags.service.book_service.get_book_or_404', side_effect=BookNotFound()):
@@ -241,7 +240,7 @@ class TestTagServiceSimple:
     async def test_add_existing_tags_to_book(self, tag_service, mock_session, sample_book, sample_tag):
         """Simple test: add existing tags to a book"""
         # Arrange
-        tag_data = TagAddModel(tags=[TagCreateModel(name="Fiction")])
+        tag_data = TagAddModel(tags=[1])
         
         # Mock for book_service.get_book_or_404
         with patch('src.tags.service.book_service.get_book_or_404', return_value=sample_book):
