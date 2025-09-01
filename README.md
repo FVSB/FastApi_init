@@ -1,112 +1,246 @@
-# Proyecto CRUD de Libros con FastAPI y PostgreSQL
 
-Este proyecto consiste en el desarrollo de una **aplicación CRUD sencilla** utilizando **FastAPI** como framework backend y **PostgreSQL** como base de datos.  
-El objetivo es gestionar información de libros y sus reseñas (**reviews**) con persistencia en la base de datos, siguiendo buenas prácticas de desarrollo, entregando pruebas unitarias con **pytest**, y documentando el proyecto con **MkDocs**.
+# 📚 FastAPI Books & Tags API
 
----
+API REST desarrollada con **FastAPI** y **PostgreSQL** para gestionar libros y etiquetas. Proyecto educativo que demuestra implementación CRUD, relaciones many-to-many y mejores prácticas.
 
-## 📚 Modelo de Datos
+## 🎯 Propósito
 
-### Entidad **Libro**
-- `title: str` → Título del libro  
-- `author: str` → Autor  
-- `publisher: str` → Editorial  
-- `published_date: date` → Fecha de publicación  
-- `page_count: int` → Número de páginas  
-- `language: str` → Idioma  
-- `created_at: datetime` → Fecha de creación del registro  
-- `updated_at: datetime` → Última actualización del registro  
-
-### Entidad **Review**
-Un libro puede tener **0 o muchas reseñas**.  
-- `rating: int = Field(lt=5)` → Valoración (0 a 4, ya que lt=5)  
-- `review_text: str` → Texto de la reseña  
-- `user_uid: Optional[uuid.UUID]` → Identificador del usuario que realiza la reseña  
-- `book_uid: Optional[uuid.UUID]` → Identificador del libro asociado  
-- `created_at: datetime` → Fecha de creación de la reseña  
-- `updated_at: datetime` → Última actualización de la reseña  
+**Caso de ejemplo** para aprender:
+- Arquitectura modular con FastAPI
+- Operaciones CRUD asíncronas
+- Relaciones many-to-many (Books ↔ Tags)
+- SQLModel + PostgreSQL
+- Testing con pytest
+- Contenerización con Docker
 
 ---
 
-## 🛠️ Tecnologías Requeridas
+## 🏗️ Arquitectura
 
-- **Python 3.10+**
-- **FastAPI**
-- **SQLAlchemy / SQLModel** (ORM para PostgreSQL)
-- **PostgreSQL** como base de datos
-- **Alembic** para migraciones de esquema
-- **Pytest** para pruebas unitarias
-- **Docker** (opcional pero recomendado)
-- **MkDocs** para documentación
+```
+src/
+├── books/          # Módulo libros (routes, schemas, service)
+├── tags/           # Módulo tags (routes, schemas, service)
+├── db/             # Modelos y conexión DB
+├── utils/          # Manejo de errores
+├── config.py       # Configuración
+└── main.py         # App principal
+```
 
----
-
-## 📋 Requerimientos Funcionales
-
-### Libros
-- Crear un nuevo libro.  
-- Visualizar todos los libros.  
-- Consultar un libro por `id`.  
-- Modificar los datos de un libro.  
-- Eliminar un libro.  
-  - **Nota:** al eliminar un libro, también deben eliminarse todas sus reseñas asociadas (**eliminación en cascada**).  
-
-### Reseñas
-- Crear una reseña para un libro.  
-- Visualizar todas las reseñas de un libro.  
-- Consultar una reseña por `id`.  
-- Modificar una reseña.  
-- Eliminar una reseña.  
+**Stack Tecnológico:**
+- FastAPI 0.116.1 + SQLModel 0.0.24
+- PostgreSQL 15 + Asyncpg
+- Alembic (migraciones)
+- pytest + Docker
 
 ---
 
-## ✅ Tareas Principales
+## 📊 Modelos de Datos
 
-### 1. Configuración del Proyecto
-- Crear entorno virtual y configurar dependencias en `requirements.txt` o `pyproject.toml`.
-- Configurar conexión a **PostgreSQL**.
-- Definir modelos de datos (`Book`, `Review`) utilizando SQLAlchemy/SQLModel.
-- Crear migraciones iniciales con **Alembic**.
+### Book
+```python
+id: int (PK)
+title: str (unique, max 100)
+author: str (max 100)
+publisher: str
+published_date: date
+page_count: int
+language_code: str (max 5)
+created_at, update_at: datetime
+tags: List[Tag]  # many-to-many
+```
 
-### 2. Implementación del CRUD con FastAPI
-- **Endpoints para `Book`**:  
-  - Crear libro  
-  - Listar libros  
-  - Consultar libro por `id`  
-  - Actualizar libro  
-  - Eliminar libro (con eliminación en cascada de reseñas).  
-- **Endpoints para `Review`**:  
-  - Crear reseña para un libro  
-  - Listar reseñas de un libro  
-  - Consultar reseña por `id`  
-  - Actualizar reseña  
-  - Eliminar reseña  
-
-### 3. Pruebas Unitarias y Documentación
-- Configurar **pytest** y base de datos de pruebas.
-- Escribir pruebas unitarias para validar todos los casos de uso del CRUD (libros y reseñas).  
-- Probar eliminación en cascada de reseñas al eliminar un libro.  
-- Crear documentación técnica con **MkDocs**:  
-  - Instalar MkDocs:  
-    ```bash
-    pip install mkdocs mkdocs-material
-    ```
-  - Crear archivo de configuración `mkdocs.yml`.
-  - Documentar el diseño del proyecto, modelos de datos, endpoints y ejemplos de uso.
-  - Generar documentación localmente:  
-    ```bash
-    mkdocs serve
-    ```
-  - Generar documentación estática:  
-    ```bash
-    mkdocs build
-    ```
+### Tag
+```python
+id: int (PK)
+name: str (unique, max 100)
+created_at: datetime
+books: List[Book]  # many-to-many
+```
 
 ---
 
-## 🚀 Ejecución del Proyecto
+## 🔌 API Endpoints
 
-1. Clonar el repositorio.  
-2. Instalar dependencias:  
-   ```bash
-   pip install -r requirements.txt
+**Base URL:** `http://localhost:8000/api/v1`
+
+### 📖 Books
+```http
+GET    /books/                    # Listar libros (?with_tags=true)
+GET    /books/books/{id}          # Obtener libro
+POST   /books/books               # Crear libro
+PUT    /books/books/{id}          # Actualizar libro
+DELETE /books/books/{id}          # Eliminar libro
+```
+
+### 🏷️ Tags
+```http
+GET    /tags/                     # Listar tags
+POST   /tags/                     # Crear tag
+PUT    /tags/{id}                 # Actualizar tag
+DELETE /tags/{id}                 # Eliminar tag
+POST   /tags/book/{id}/tags       # Añadir tags a libro
+```
+
+### Ejemplo de Request/Response
+
+**POST** `/books/books`
+```json
+{
+  "title": "Cien años de soledad",
+  "author": "Gabriel García Márquez",
+  "publisher": "Sudamericana",
+  "published_date": "1967-05-30",
+  "page_count": 471,
+  "language_code": "es",
+  "created_at": "2024-01-15T10:30:00",
+  "update_at": "2024-01-15T10:30:00"
+}
+```
+
+**Response** `201 Created`:
+```json
+{
+  "id": 1,
+  "title": "Cien años de soledad",
+  "author": "Gabriel García Márquez",
+  "tags": [
+    {"id": 1, "name": "Realismo Mágico", "created_at": "2024-01-15T09:00:00"}
+  ]
+}
+```
+
+---
+
+## 🚀 Instalación y Ejecución
+
+### Opción 1: Docker Compose (Recomendado)
+
+```bash
+# 1. Clonar repositorio
+git clone <repo-url>
+cd FastApi_init
+
+# 2. Crear .env
+cat > .env << EOF
+POSTGRES_USER=postgres
+POSTGRES_DB=bookdb
+POSTGRES_PASSWORD=postgres123
+DATABASE_URL=postgresql+asyncpg://postgres:postgres123@db:5432/bookdb
+DATABASE_MIGRATIONS_URL=postgresql://postgres:postgres123@db:5432/bookdb
+EOF
+
+# 3. Levantar servicios
+docker-compose up -d
+
+# 4. Ejecutar migraciones
+docker-compose exec app alembic upgrade head
+```
+
+### Opción 2: Local
+
+```bash
+# 1. Preparar entorno
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# 2. Configurar PostgreSQL y variables de entorno
+export DATABASE_URL="postgresql+asyncpg://user:pass@localhost:5432/bookdb"
+export DATABASE_MIGRATIONS_URL="postgresql://user:pass@localhost:5432/bookdb"
+
+# 3. Migraciones y ejecutar
+alembic upgrade head
+python src/main.py
+```
+
+### Acceso
+- **API:** http://localhost:8000
+- **Docs:** http://localhost:8000/docs
+- **ReDoc:** http://localhost:8000/redoc
+
+### Testing
+```bash
+pytest                    # Todas las pruebas
+pytest --cov=src         # Con cobertura
+pytest test/test_*.py    # Pruebas específicas
+```
+
+---
+
+## 🛠️ Mejoras Sugeridas (Caso de Estudio)
+
+### ✅ Implementado
+- ✓ CRUD completo asíncrono
+- ✓ Validación con Pydantic
+- ✓ Relaciones many-to-many
+- ✓ Documentación automática
+- ✓ Testing básico
+- ✓ Contenerización
+
+### 🔧 Oportunidades de Mejora
+
+#### 1. **Autenticación & Seguridad**
+```python
+# TODO: JWT authentication
+from fastapi.security import HTTPBearer
+# TODO: Role-based access control
+# TODO: Rate limiting
+```
+
+#### 2. **Performance & Escalabilidad**
+```python
+# TODO: Paginación en endpoints
+@router.get("/books/")
+async def get_books(page: int = 1, size: int = 10):
+    # Implementar offset/limit
+
+# TODO: Cache con Redis
+# TODO: Connection pooling optimizado
+# TODO: Índices de DB optimizados
+```
+
+#### 3. **Observabilidad**
+```python
+# TODO: Logging estructurado
+import structlog
+# TODO: Métricas (Prometheus)
+# TODO: Health checks
+# TODO: Distributed tracing
+```
+
+#### 4. **Validaciones de Negocio**
+```python
+# TODO: Validaciones más robustas
+@validator('published_date')
+def validate_date(cls, v):
+    if v > date.today():
+        raise ValueError('No puede ser futuro')
+    return v
+```
+
+#### 5. **Testing Avanzado**
+```python
+# TODO: Integration tests
+# TODO: Property-based testing (Hypothesis)
+# TODO: Load testing (Locust)
+# TODO: Contract testing
+```
+
+### 🚀 Roadmap Sugerido
+1. **Auth JWT** → Seguridad básica
+2. **Cache Redis** → Performance
+3. **Búsqueda Full-text** → Elasticsearch
+4. **Real-time** → WebSockets
+5. **Microservices** → Event-driven architecture
+
+---
+
+## 📝 Contribuir
+
+1. Fork → `git checkout -b feature/nueva-funcionalidad`
+2. Commit → `git commit -am 'Add feature'`
+3. Push → `git push origin feature/nueva-funcionalidad`
+4. Pull Request
+
+**Licencia:** MIT | **Autor:** Proyecto educativo FastAPI + PostgreSQL
