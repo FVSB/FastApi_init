@@ -33,5 +33,5 @@ def register_middleware(app: FastAPI):
 
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=["localhost", "127.0.0.1","0.0.0.0","books_demo.fvsb.dev"],
+        allowed_hosts=["localhost", "127.0.0.1","0.0.0.0","books_demo.fvsb.dev","http://localhost:3000"],
     )

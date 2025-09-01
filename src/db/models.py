@@ -3,18 +3,18 @@ from typing import List, Optional
 from sqlmodel import SQLModel,Column,Field,Integer, Relationship
 from sqlalchemy  import func
 import sqlalchemy.dialects.postgresql as pg
-import uuid
+
 
     
 class BookTag(SQLModel, table=True):
-    book_id: uuid.UUID = Field(default=None, foreign_key="books.uid", primary_key=True)
-    tag_id: uuid.UUID = Field(default=None, foreign_key="tags.uid", primary_key=True)
+    book_id: int = Field(default=None,foreign_key="books.id", primary_key=True)
+    tag_id: int = Field(default=None, foreign_key="tags.id", primary_key=True)
 
 class Tag(SQLModel, table=True):
     __tablename__ = "tags"
-    uid: uuid.UUID = Field(
-        sa_column=Column(pg.UUID, nullable=False, primary_key=True, default=uuid.uuid4)
-    )
+    id: int = Field(
+    sa_column=Column(Integer, nullable=False, primary_key=True, autoincrement=True)
+)
     name: str = Field(sa_column=Column(pg.VARCHAR(length=100), nullable=False, unique=True))
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
     books: List["Book"] = Relationship(
@@ -30,8 +30,8 @@ class Tag(SQLModel, table=True):
 
 class Book(SQLModel, table=True):
     __tablename__ = "books"
-    uid: uuid.UUID = Field(
-        sa_column=Column(pg.UUID, nullable=False, primary_key=True, default=uuid.uuid4)
+    id: int = Field(
+        sa_column=Column(Integer, nullable=False, primary_key=True, autoincrement=True)
     )
     title: str = Field(sa_column=Column(pg.VARCHAR(100), nullable=False,  unique=True))
     author: str =  Field(sa_column=Column(pg.VARCHAR(100), nullable=True))

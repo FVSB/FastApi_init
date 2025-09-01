@@ -24,3 +24,9 @@ register_all_errors(app)
 
 app.include_router(book_router, prefix=f"{version_prefix}/books", tags=["books"])
 app.include_router(tags_router, prefix=f"{version_prefix}/tags", tags=["tags"])
+
+
+# Add entry point for direct execution
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
